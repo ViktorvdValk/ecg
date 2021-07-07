@@ -1,6 +1,6 @@
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
+
+
+
 
 import json
 import keras
@@ -14,7 +14,7 @@ STEP = 256
 
 def data_generator(batch_size, preproc, x, y):
     num_examples = len(x)
-    examples = zip(x, y)
+    examples = list(zip(x, y))
     examples = sorted(examples, key = lambda x: x[0].shape[0])
     end = num_examples - batch_size + 1
     batches = [examples[i:i+batch_size]
@@ -22,7 +22,7 @@ def data_generator(batch_size, preproc, x, y):
     random.shuffle(batches)
     while True:
         for batch in batches:
-            x, y = zip(*batch)
+            x, y = list(zip(*batch))
             yield preproc.process(x, y)
 
 class Preproc:
@@ -30,8 +30,8 @@ class Preproc:
     def __init__(self, ecg, labels):
         self.mean, self.std = compute_mean_std(ecg)
         self.classes = sorted(set(l for label in labels for l in label))
-        self.int_to_class = dict( zip(range(len(self.classes)), self.classes))
-        self.class_to_int = {c : i for i, c in self.int_to_class.items()}
+        self.int_to_class = dict( list(zip(list(range(len(self.classes))), self.classes)))
+        self.class_to_int = {c : i for i, c in list(self.int_to_class.items())}
 
     def process(self, x, y):
         return self.process_x(x), self.process_y(y)

@@ -29,4 +29,4 @@ def predict(record):
 
 if __name__ == '__main__':
     import sys
-    print predict(sys.argv[1])
+    print(predict(sys.argv[1]))
