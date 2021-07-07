@@ -11,18 +11,19 @@ def load_ecg_mat(ecg_file):
     return sio.loadmat(ecg_file)['val'].squeeze()
 
 def load_all(data_path):
-    label_file = os.path.join(data_path, "../REFERENCE-v3.csv")
+    label_file = os.path.join(data_path, "REFERENCE-original.csv")
+    print(label_file)
     with open(label_file, 'r') as fid:
         records = [l.strip().split(",") for l in fid]
-
+    print(records)
     dataset = []
     for record, label in tqdm.tqdm(records):
         ecg_file = os.path.join(data_path, record + ".mat")
         ecg_file = os.path.abspath(ecg_file)
         ecg = load_ecg_mat(ecg_file)
-        num_labels = ecg.shape[0] / STEP
+        num_labels = int(ecg.shape[0] / STEP)
         dataset.append((ecg_file, [label]*num_labels))
-    return dataset 
+    return dataset
 
 def split(dataset, dev_frac):
     dev_cut = int(dev_frac * len(dataset))
@@ -48,4 +49,3 @@ if __name__ == "__main__":
     train, dev = split(dataset, dev_frac)
     make_json("train.json", train)
     make_json("dev.json", dev)
-
