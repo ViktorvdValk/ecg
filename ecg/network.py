@@ -1,14 +1,13 @@
-# from keras import backend as K
 import tensorflow.keras.backend as K
+from tensorflow.keras.layers import BatchNormalization, Activation, Dropout, Conv1D, Add, MaxPooling1D, Lambda, Dense, Activation, TimeDistributed, Input
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
 
 def _bn_relu(layer, dropout=0, **params):
-    from tensorflow.keras.layers import BatchNormalization
-    from tensorflow.keras.layers import Activation
     layer = BatchNormalization()(layer)
     layer = Activation(params["conv_activation"])(layer)
 
     if dropout > 0:
-        from tensorflow.keras.layers import Dropout
         layer = Dropout(params["conv_dropout"])(layer)
 
     return layer
@@ -19,7 +18,6 @@ def add_conv_weight(
         num_filters,
         subsample_length=1,
         **params):
-    from tensorflow.keras.layers import Conv1D
     layer = Conv1D(
         filters=num_filters,
         kernel_size=filter_length,
@@ -46,9 +44,7 @@ def resnet_block(
         subsample_length,
         block_index,
         **params):
-    from tensorflow.keras.layers import Add
-    from tensorflow.keras.layers import MaxPooling1D
-    from tensorflow.keras.layers import Lambda
+
 
     def zeropad(x):
         y = K.zeros_like(x)
@@ -106,13 +102,11 @@ def add_resnet_layers(layer, **params):
     return layer
 
 def add_output_layer(layer, **params):
-    from tensorflow.keras.layers import Dense, Activation
-    from tensorflow.keras.layers import TimeDistributed
+
     layer = TimeDistributed(Dense(params["num_categories"]))(layer)
     return Activation('softmax')(layer)
 
 def add_compile(model, **params):
-    from tensorflow.keras.optimizers import Adam
     optimizer = Adam(
         learning_rate=params["learning_rate"],
         clipnorm=params.get("clipnorm", 1))
@@ -122,8 +116,7 @@ def add_compile(model, **params):
                   metrics=['accuracy'])
 
 def build_network(**params):
-    from tensorflow.keras.models import Model
-    from tensorflow.keras.layers import Input
+
     inputs = Input(shape=params['input_shape'],
                    dtype='float32',
                    name='inputs')

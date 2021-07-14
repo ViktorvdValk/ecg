@@ -1,20 +1,15 @@
-
-
-
-
 import argparse
 import json
-import keras
+import tensorflow.keras
 import numpy as np
 import os
 import random
 import time
-
 import network
 import load
 import util
 
-MAX_EPOCHS = 10
+MAX_EPOCHS = 100
 
 def make_save_dir(dirname, experiment_name):
     start_time = str(int(time.time())) + '-' + str(random.randrange(1000))
@@ -25,7 +20,7 @@ def make_save_dir(dirname, experiment_name):
 
 def get_filename_for_saving(save_dir):
     return os.path.join(save_dir,
-            "{val_loss:.3f}-{val_accuracy:.3f}-{epoch:03d}-{loss:.3f}-{acc:.3f}.hdf5")
+            "{val_loss:.3f}-{val_accuracy:.3f}-{epoch:03d}-{loss:.3f}-{accuracy:.3f}.hdf5")
 
 def train(args, params):
 
@@ -50,14 +45,14 @@ def train(args, params):
 
     model = network.build_network(**params)
 
-    stopping = keras.callbacks.EarlyStopping(patience=8)
+    stopping = tensorflow.keras.callbacks.EarlyStopping(patience=8)
 
-    reduce_lr = keras.callbacks.ReduceLROnPlateau(
+    reduce_lr = tensorflow.keras.callbacks.ReduceLROnPlateau(
         factor=0.1,
         patience=2,
         min_lr=params["learning_rate"] * 0.001)
 
-    checkpointer = keras.callbacks.ModelCheckpoint(
+    checkpointer = tensorflow.keras.callbacks.ModelCheckpoint(
         filepath=get_filename_for_saving(save_dir),
         save_best_only=False)
 
