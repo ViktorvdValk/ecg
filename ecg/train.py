@@ -11,6 +11,7 @@ import util
 
 MAX_EPOCHS = 100
 
+
 def make_save_dir(dirname, experiment_name):
     start_time = str(int(time.time())) + '-' + str(random.randrange(1000))
     save_dir = os.path.join(dirname, experiment_name, start_time)
@@ -18,9 +19,11 @@ def make_save_dir(dirname, experiment_name):
         os.makedirs(save_dir)
     return save_dir
 
+
 def get_filename_for_saving(save_dir):
     return os.path.join(save_dir,
-            "{val_loss:.3f}-{val_accuracy:.3f}-{epoch:03d}-{loss:.3f}-{accuracy:.3f}.hdf5")
+                        "{val_loss:.3f}-{val_accuracy:.3f}-{epoch:03d}-{loss:.3f}-{accuracy:.3f}.hdf5")
+
 
 def train(args, params):
 
@@ -32,7 +35,6 @@ def train(args, params):
     preproc = load.Preproc(*train)
     print("Training size: " + str(len(train[0])) + " examples.")
     print("Dev size: " + str(len(dev[0])) + " examples.")
-
 
     save_dir = make_save_dir(params['save_dir'], args.experiment)
 
@@ -77,6 +79,7 @@ def train(args, params):
             epochs=MAX_EPOCHS,
             validation_data=(dev_x, dev_y),
             callbacks=[checkpointer, reduce_lr, stopping])
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

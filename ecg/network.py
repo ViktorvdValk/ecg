@@ -1,7 +1,10 @@
 import tensorflow.keras.backend as K
-from tensorflow.keras.layers import BatchNormalization, Activation, Dropout, Conv1D, Add, MaxPooling1D, Lambda, Dense, Activation, TimeDistributed, Input
+from tensorflow.keras.layers import BatchNormalization, Activation, Dropout, \
+                                    Conv1D, Add, MaxPooling1D, Lambda, Dense, \
+                                    Activation, TimeDistributed, Input
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
+
 
 def _bn_relu(layer, dropout=0, **params):
     layer = BatchNormalization()(layer)
@@ -11,6 +14,7 @@ def _bn_relu(layer, dropout=0, **params):
         layer = Dropout(params["conv_dropout"])(layer)
 
     return layer
+
 
 def add_conv_weight(
         layer,
@@ -38,6 +42,19 @@ def add_conv_layers(layer, **params):
         layer = _bn_relu(layer, **params)
     return layer
 
+
+def zeropad(x):
+    y = K.zeros_like(x)
+    return K.concatenate([x, y], axis=2)
+
+
+def zeropad_output_shape(input_shape):
+    shape = list(input_shape)
+    assert len(shape) == 3
+    shape[2] *= 2
+    return tuple(shape)
+
+
 def resnet_block(
         layer,
         num_filters,
@@ -45,18 +62,14 @@ def resnet_block(
         block_index,
         **params):
 
-
-    def zeropad(x):
-        y = K.zeros_like(x)
-        return K.concatenate([x, y], axis=2)
-
-    def zeropad_output_shape(input_shape):
-        shape = list(input_shape)
-        assert len(shape) == 3
-        shape[2] *= 2
-        return tuple(shape)
+    print(tensorflow.keras.shape(layer.input))
+    print(tensorflow.keras.shape(layer.output))
 
     shortcut = MaxPooling1D(pool_size=subsample_length)(layer)
+
+    print(tensorflow.keras.shape(shortcut.input))
+    print(tensorflow.keras.shape(shortcut.output))
+
     zero_pad = (block_index % params["conv_increase_channels_at"]) == 0 \
         and block_index > 0
     if zero_pad is True:
@@ -77,9 +90,11 @@ def resnet_block(
     layer = Add()([shortcut, layer])
     return layer
 
+
 def get_num_filters_at_index(index, num_start_filters, **params):
     return 2**int(index / params["conv_increase_channels_at"]) \
         * num_start_filters
+
 
 def add_resnet_layers(layer, **params):
     layer = add_conv_weight(
@@ -101,10 +116,12 @@ def add_resnet_layers(layer, **params):
     layer = _bn_relu(layer, **params)
     return layer
 
+
 def add_output_layer(layer, **params):
 
     layer = TimeDistributed(Dense(params["num_categories"]))(layer)
     return Activation('softmax')(layer)
+
 
 def add_compile(model, **params):
     optimizer = Adam(
@@ -114,6 +131,7 @@ def add_compile(model, **params):
     model.compile(loss='categorical_crossentropy',
                   optimizer=optimizer,
                   metrics=['accuracy'])
+
 
 def build_network(**params):
 

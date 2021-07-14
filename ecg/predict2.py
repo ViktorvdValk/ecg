@@ -10,9 +10,12 @@ from load import load_dataset
 from util import load
 
 STEP = 256
+
+
 def truncate(x):
     x_trunc = STEP * int(len(x[0]) / STEP)
     return x[:, :x_trunc]
+
 
 def predict2(data_path, model_path):
     preproc = load(os.path.dirname(model_path))
@@ -31,6 +34,7 @@ def predict2(data_path, model_path):
     with open(output, "wb") as fp:
         pickle.dump(probs, fp)
     return probs
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

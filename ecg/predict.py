@@ -9,6 +9,7 @@ import pickle
 from load import load_dataset
 from util import load
 
+
 def predict(data_json, model_path):
     preproc = load(os.path.dirname(model_path))
     dataset = load_dataset(data_json)
@@ -20,6 +21,7 @@ def predict(data_json, model_path):
     with open(output, "wb") as fp:
         pickle.dump(probs, fp)
     return probs
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
